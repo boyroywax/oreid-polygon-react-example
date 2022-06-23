@@ -33,6 +33,8 @@ export const UserBalance: React.FC = () => {
         >
             Update Balance
         </Button>
+        <h2>{ account?.chainAccount }</h2>
+        <h3>{ account?.chainNetwork }</h3>
         <h3><b><i>{ userBalance }</i></b> Test Tokens </h3>
         </>
     )

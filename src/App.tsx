@@ -4,10 +4,10 @@ import { WebPopup } from "oreid-webpopup";
 import React, { useEffect, useState } from "react";
 
 import "./App.css";
-// import { ExternalWallet } from "./ExternalWallet";
+import { ExternalWallet } from "./ExternalWallet";
 import { Header } from "./Header";
 import { LoginPage } from "./LoginPage";
-// import { UserBalance } from "./OreIdWallet";
+import { UserBalance } from "./OreIdWallet";
 import { REACT_APP_OREID_APP_ID } from "./constants";
 
 
@@ -19,7 +19,7 @@ const transitProviders = [
 const oreId = new OreId({
 	appName: "Polygon ORE-ID Sample App",
 	appId: REACT_APP_OREID_APP_ID,
-	oreIdUrl: "https://service.oreid.io",
+	oreIdUrl: "https://staging.service.oreid.io",
 	plugins: {
 		popup: WebPopup(),
 	},
@@ -31,8 +31,8 @@ const LoggedInView: React.FC = () => {
 	if (!user) return null;
 	return (
 		<>
-			{/* <UserBalance /> */}
-			{/* <ExternalWallet /> */}
+			<UserBalance />
+			<ExternalWallet />
 		</>
 	)
 };
