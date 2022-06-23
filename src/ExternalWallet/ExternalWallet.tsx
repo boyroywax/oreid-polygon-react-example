@@ -15,6 +15,10 @@ export const ExternalWallet: React.FC = () => {
 
     const oreId = useOreId()
     const user = useUser()
+
+    const account = oreId.auth.user.data.chainAccounts.find(
+        (chainAccount) => chainAccount.chainNetwork === ChainNetwork.PolygonMumbai
+    )
     
     // 
     // Sign String with Scatter Wallet
@@ -22,7 +26,7 @@ export const ExternalWallet: React.FC = () => {
     const signStringParam: SignStringParams = {
 		account: user?.accountName || "",
 		walletType: ExternalWalletType.Web3,
-		chainAccount: user?.accountName || "",
+		chainAccount: account?.chainAccount || "",
 		chainNetwork: ChainNetwork.PolygonMumbai,
 		string: "Linking Account to ORE ID",
 		message: "Testing"
@@ -82,10 +86,10 @@ export const ExternalWallet: React.FC = () => {
 
     const transactionData: TransactionData = {
         account: user?.accountName,
-        chainAccount: user?.accountName || "",
+        chainAccount: account?.chainAccount || "",
         chainNetwork: ChainNetwork.PolygonMumbai,
         transaction: {
-            account: user?.accountName || "",	
+            account: account?.chainAccount || "",	
             string: "Linking Account to ORE ID",
 		    message: "Testing"
         },
@@ -94,14 +98,17 @@ export const ExternalWallet: React.FC = () => {
 
     const transaction = async () => {
        const transaction: Transaction = await oreId.createTransaction( transactionData )
-       return transaction as Transaction
+       return transaction
     }
+
+    
 
 
     const loginSignWithWallet = async () => {
+        const signTransaction: Transaction = await transaction()
         try {
             const popupSignParams: PopupPluginSignParams = {
-                transaction: await transaction()
+                transaction: signTransaction
             }
 
             await oreId.popup.sign( popupSignParams )
@@ -121,25 +128,25 @@ export const ExternalWallet: React.FC = () => {
                         discoverWallet()
                     }
                 }>
-                    Discover Scatter
+                    Discover MetaMask
                 </Button> <Button
                     onClick={() => {
                         signStringWithWallet()
                     }
                 }>
-                    Sign String Scatter
+                    Sign String MetaMask
                 </Button> <Button
                     onClick={() => {
                         loginAuthWithWallet()
                     }
                 }>
-                    Popup Login Scatter
+                    Popup Login MetaMask
                 </Button> <Button
                     onClick={() => {
                         loginSignWithWallet()
                     }
                 }>
-                    Popup Sign Scatter
+                    Popup Sign MetaMask
                 </Button>
 
         </div>
