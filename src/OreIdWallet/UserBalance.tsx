@@ -2,13 +2,14 @@ import { ChainNetwork, UserChainAccount, UserData } from "oreid-js";
 import { useUser } from "oreid-react";
 import React, { useEffect, useState } from "react";
 import { Button } from "src/Button";
-import { getBalance } from "src/helpers/polygon";
+import { getBalance, getTstTokenBalance } from "src/helpers/polygon";
 import { useOreId } from "oreid-react";
 
 
 export const UserBalance: React.FC = () => {
     const user: UserData | undefined = useUser()
     const[ userBalance, setUserBalance ] = useState("0.00")
+    const[ userTstBalance, setUserTstBalance ] = useState("0.00")
     const oreId = useOreId()
     const account = oreId.auth.user.data.chainAccounts.find(
         (chainAccount) => chainAccount.chainNetwork === ChainNetwork.PolygonMumbai
@@ -18,6 +19,9 @@ export const UserBalance: React.FC = () => {
     async function fetchBalance( account: UserChainAccount | undefined ) {
         const balance = await getBalance( account )
         setUserBalance( balance )
+
+        const tstBalance = await getTstTokenBalance( account )
+        setUserTstBalance( tstBalance )
     } 
 
 
@@ -36,6 +40,7 @@ export const UserBalance: React.FC = () => {
         <h2>{ account?.chainAccount }</h2>
         <h3>{ account?.chainNetwork }</h3>
         <h3><b><i>{ userBalance }</i></b> Test Tokens </h3>
+        <h3><b><i>{ userTstBalance }</i></b> Test Tokens </h3>
         </>
     )
 
