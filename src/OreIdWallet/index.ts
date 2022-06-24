@@ -1,2 +1,3 @@
 export * from "./UserBalance"
-export * from "./TokenTransfers"
+export * from "./TokenTransfer"
+export * from "./Erc20Transfer"

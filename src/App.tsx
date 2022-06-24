@@ -7,8 +7,9 @@ import "./App.css";
 import { ExternalWallet } from "./ExternalWallet";
 import { Header } from "./Header";
 import { LoginPage } from "./LoginPage";
-import { TokenTransfers, UserBalance } from "./OreIdWallet";
+import { Erc20Transfer, TokenTransfer, UserBalance } from "./OreIdWallet";
 import { REACT_APP_OREID_APP_ID } from "./constants";
+import { Erc1155Transfer } from "./OreIdWallet/Erc1155Transfer";
 
 
 const transitProviders = [
@@ -32,7 +33,9 @@ const LoggedInView: React.FC = () => {
 	return (
 		<>
 			<UserBalance />
-			<TokenTransfers />
+			<TokenTransfer />
+			<Erc20Transfer />
+			<Erc1155Transfer />
 			<ExternalWallet />
 		</>
 	)

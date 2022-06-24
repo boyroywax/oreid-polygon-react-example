@@ -4,7 +4,10 @@ import Web3 from "web3"
 import { AbiItem } from 'web3-utils';
 
 
-const mumbaiEndpoints = [{ url: "https://rpc-mumbai.maticvigil.com" }]
+const mumbaiEndpoints = [
+    { url: "https://rpc-mumbai.maticvigil.com" },
+    { url: "https://rpc-mumbai.matic.today"}
+]
 const provider = new Web3.providers.HttpProvider( mumbaiEndpoints[0].url )
 const web3 = new Web3( provider )
 
@@ -54,7 +57,9 @@ export const getNFTTokenBalance = async ( account: UserChainAccount | undefined 
     return result
 }
 
-
+// 
+// Creat transaction using chainjs
+// 
 export const createTransferTransaction = async ( account: UserChainAccount | undefined, toAddress: string, value: string ): Promise<Transaction> => {
     const mumbaiChainOptions = {
         chainName: "mumbai"

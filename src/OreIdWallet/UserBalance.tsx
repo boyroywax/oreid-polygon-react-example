@@ -29,7 +29,6 @@ export const UserBalance: React.FC = () => {
         setUserNftBalance( nftBalance )
     } 
 
-
     useEffect(() => {
         fetchBalance( account )
     })
@@ -49,5 +48,4 @@ export const UserBalance: React.FC = () => {
         <h3><b><i>{ userNftBalance }</i></b> NFTs</h3>
         </>
     )
-
 }

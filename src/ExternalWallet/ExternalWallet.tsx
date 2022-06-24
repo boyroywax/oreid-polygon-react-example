@@ -12,7 +12,6 @@ import { AuthProvider,
 import { Button } from "src/Button"
 
 export const ExternalWallet: React.FC = () => {
-
     const oreId = useOreId()
     const user = useUser()
 
@@ -101,9 +100,6 @@ export const ExternalWallet: React.FC = () => {
        return transaction
     }
 
-    
-
-
     const loginSignWithWallet = async () => {
         const signTransaction: Transaction = await transaction()
         try {
@@ -115,7 +111,7 @@ export const ExternalWallet: React.FC = () => {
                 .catch( (error) => console.error(error))
         }
         catch (error) {
-            console.error( `discoverWallet failed: ${error}` )
+            console.error( `loginSignWithWallet failed: ${error}` )
         }
     }
 
