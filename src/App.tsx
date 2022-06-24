@@ -7,7 +7,7 @@ import "./App.css";
 import { ExternalWallet } from "./ExternalWallet";
 import { Header } from "./Header";
 import { LoginPage } from "./LoginPage";
-import { UserBalance } from "./OreIdWallet";
+import { TokenTransfers, UserBalance } from "./OreIdWallet";
 import { REACT_APP_OREID_APP_ID } from "./constants";
 
 
@@ -32,6 +32,7 @@ const LoggedInView: React.FC = () => {
 	return (
 		<>
 			<UserBalance />
+			<TokenTransfers />
 			<ExternalWallet />
 		</>
 	)

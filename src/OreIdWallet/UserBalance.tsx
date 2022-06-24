@@ -2,7 +2,7 @@ import { ChainNetwork, UserChainAccount, UserData } from "oreid-js";
 import { useUser } from "oreid-react";
 import React, { useEffect, useState } from "react";
 import { Button } from "src/Button";
-import { getBalance, getTstTokenBalance } from "src/helpers/polygon";
+import { getBalance, getNFTTokenBalance, getTstTokenBalance } from "src/helpers/polygon";
 import { useOreId } from "oreid-react";
 
 
@@ -10,6 +10,8 @@ export const UserBalance: React.FC = () => {
     const user: UserData | undefined = useUser()
     const[ userBalance, setUserBalance ] = useState("0.00")
     const[ userTstBalance, setUserTstBalance ] = useState("0.00")
+    const[ userNftBalance, setUserNftBalance ] = useState("0")
+
     const oreId = useOreId()
     const account = oreId.auth.user.data.chainAccounts.find(
         (chainAccount) => chainAccount.chainNetwork === ChainNetwork.PolygonMumbai
@@ -22,6 +24,9 @@ export const UserBalance: React.FC = () => {
 
         const tstBalance = await getTstTokenBalance( account )
         setUserTstBalance( tstBalance )
+
+        const nftBalance = await getNFTTokenBalance( account )
+        setUserNftBalance( nftBalance )
     } 
 
 
@@ -39,8 +44,9 @@ export const UserBalance: React.FC = () => {
         </Button>
         <h2>{ account?.chainAccount }</h2>
         <h3>{ account?.chainNetwork }</h3>
-        <h3><b><i>{ userBalance }</i></b> Test Tokens </h3>
-        <h3><b><i>{ userTstBalance }</i></b> Test Tokens </h3>
+        <h3><b><i>{ userBalance }</i></b> MATIC Test Tokens</h3>
+        <h3><b><i>{ userTstBalance }</i></b> TST Test Tokens</h3>
+        <h3><b><i>{ userNftBalance }</i></b> NFTs</h3>
         </>
     )
 
