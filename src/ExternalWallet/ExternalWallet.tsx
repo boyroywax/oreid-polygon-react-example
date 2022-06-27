@@ -21,7 +21,7 @@ export const ExternalWallet: React.FC = () => {
     )
     
     // 
-    // Sign String with Scatter Wallet
+    // Sign String with MetMask Wallet
     // 
     const signStringParam: SignStringParams = {
 		account: user?.accountName || "",
@@ -45,7 +45,7 @@ export const ExternalWallet: React.FC = () => {
 	}
 
     // 
-    // Discover Scatter Wallet
+    // Discover MetMask Wallet
     // 
     const discoverWallet = () => {
         try {
@@ -58,7 +58,7 @@ export const ExternalWallet: React.FC = () => {
     }
 
     // 
-    // Popup Login Scatter
+    // Popup Login MetMask
     // 
     const popupAuthParams: PopupPluginAuthParams = {
         provider: AuthProvider.Web3
@@ -75,7 +75,7 @@ export const ExternalWallet: React.FC = () => {
     }
 
     // 
-    // Popup Sign Scatter
+    // Popup Sign MetMask
     // 
     const transactionSignOptions: TransactionSignOptions = {
         preventAutosign: true,
@@ -118,7 +118,7 @@ export const ExternalWallet: React.FC = () => {
 
     return (
         <div>
-            <h2>External ORE Wallet</h2>
+            <h2>External Wallet</h2>
             <br />
                 <Button
                     onClick={() => {
