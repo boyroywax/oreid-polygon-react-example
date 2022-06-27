@@ -83,10 +83,12 @@ export const Erc1155Transfer: React.FC = () => {
                         }} id={erc1155Recipient}></input>
                 </div>
             </div>
+            <br />
             <div className="App-button">
                 <Button
                     onClick={() => handleSign()}
-                />
+                > Send NFT
+                </Button>
             </div>
         </div>
         </>

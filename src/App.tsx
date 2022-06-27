@@ -33,9 +33,22 @@ const LoggedInView: React.FC = () => {
 	return (
 		<>
 			<UserBalance />
-			<TokenTransfer />
-			<Erc20Transfer />
-			<Erc1155Transfer />
+			<table width="75%">
+				<tbody>
+					<tr>
+						<td align="center">
+							<TokenTransfer />
+						</td>
+						<td align="center">
+							<Erc20Transfer />
+						</td>
+						<td align="center">
+							<Erc1155Transfer />
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<br />
 			<ExternalWallet />
 		</>
 	)

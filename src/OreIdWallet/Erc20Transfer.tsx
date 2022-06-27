@@ -57,7 +57,7 @@ export const Erc20Transfer: React.FC = () => {
     return (
         <>
         <div style={{ marginTop: 10, marginBottom: 20 }}>
-            <h2>Transfer TST Token</h2>
+            <h2>Transfer TST Token (ERC-20)</h2>
             <div className="input-wrapper">
                 <div>
                     Amount
@@ -81,10 +81,12 @@ export const Erc20Transfer: React.FC = () => {
                         }} id={recipient}></input>
                 </div>
             </div>
+            <br />
             <div className="App-button">
                 <Button
                     onClick={() => handleSign()}
-                />
+                > Send TST Token 
+                </Button>
             </div>
         </div>
         </>

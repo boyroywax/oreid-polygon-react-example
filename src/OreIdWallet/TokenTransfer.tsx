@@ -79,10 +79,12 @@ export const TokenTransfer: React.FC = () => {
                         }} id={toAddress}></input>
                 </div>
             </div>
+            <br />
             <div className="App-button">
                 <Button
                     onClick={() => handleSign()}
-                />
+                > Send MATIC 
+                </Button>
             </div>
         </div>
         </>
