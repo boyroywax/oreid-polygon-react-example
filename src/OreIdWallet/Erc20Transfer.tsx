@@ -2,7 +2,10 @@ import React, { useState } from "react";
 import { useOreId, useUser } from "oreid-react";
 
 import { Button } from "src/Button";
-import { ChainNetwork } from "oreid-js";
+import { ChainNetwork, UserChainAccount } from "oreid-js";
+import { ChainFactory } from "@open-rights-exchange/chainjs";
+import { ChainType } from "@open-rights-exchange/chainjs/dist/models";
+import { createErc20TstTransferTxn } from "src/helpers";
 
 
 export const Erc20Transfer: React.FC = () => {
@@ -15,7 +18,7 @@ export const Erc20Transfer: React.FC = () => {
     if (!userData) return null;
 
     const handleSign = async () => {
-        const signingAccount = userData.chainAccounts.find(
+        const signingAccount: UserChainAccount | undefined = userData.chainAccounts.find(
             (ca) => ca.chainNetwork === polygonChainType
         )
 
@@ -26,15 +29,27 @@ export const Erc20Transfer: React.FC = () => {
             return
         }
 
-        const transactionBody = {
-            "contractName": "0x2d7882beDcbfDDce29Ba99965dd3cdF7fcB10A1e",
-            "contractAction": "transfer",
-            "actions": [{
-                // "from": signingAccount.chainAccount,
-                "to": recipient,
-                "amount": erc20Amount,
-            }]
-        }
+        const erc20TstContract = "0x2d7882beDcbfDDce29Ba99965dd3cdF7fcB10A1e"
+
+        console.log( `recipient: ${recipient} \n amount: ${erc20Amount}`)
+        
+        const transactionBody = await createErc20TstTransferTxn(
+            signingAccount,
+            recipient,
+            erc20Amount
+        )
+
+        console.log("ERC20 Transaction Body: " + JSON.stringify(transactionBody))
+
+        // const transactionBody = {
+        //     "contractName": "0x2d7882beDcbfDDce29Ba99965dd3cdF7fcB10A1e",
+        //     "contractAction": "transfer",
+        //     "actions": [{
+        //         // "from": signingAccount.chainAccount,
+        //         "to": recipient,
+        //         "amount": erc20Amount,
+        //     }]
+        // }
 
         const transaction = await oreId.createTransaction({
             chainAccount: signingAccount.chainAccount,
@@ -63,7 +78,7 @@ export const Erc20Transfer: React.FC = () => {
                     Amount
                     <br />
                     <input 
-                        name="amount"
+                        name="erc20Amount"
                         onChange={(e) => {
                             e.preventDefault();
                             setErc20Amount(e.target.value);

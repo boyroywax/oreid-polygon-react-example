@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useOreId, useUser } from "oreid-react";
 
 import { Button } from "src/Button";
+import { Transaction } from "oreid-js";
 
 
 export const TokenTransfer: React.FC = () => {
@@ -33,7 +34,7 @@ export const TokenTransfer: React.FC = () => {
             }]
         }
 
-        const transaction = await oreId.createTransaction({
+        const transaction: Transaction = await oreId.createTransaction({
             chainAccount: signingAccount.chainAccount,
             chainNetwork: signingAccount.chainNetwork,
             //@ts-ignore

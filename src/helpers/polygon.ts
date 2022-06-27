@@ -1,4 +1,6 @@
 import { ChainFactory, ChainType, Transaction } from "@open-rights-exchange/chainjs";
+import { toEthereumAddress, toEthereumSymbol, toEthUnit } from "@open-rights-exchange/chainjs/dist/chains/ethereum_1/helpers";
+import { ChainActionType, TxExecutionPriority } from "@open-rights-exchange/chainjs/dist/models";
 import { UserChainAccount } from "oreid-js"
 import Web3 from "web3"
 import { AbiItem } from 'web3-utils';
@@ -60,9 +62,9 @@ export const getNFTTokenBalance = async ( account: UserChainAccount | undefined 
 // 
 // Creat transaction using chainjs
 // 
-export const createTransferTransaction = async ( account: UserChainAccount | undefined, toAddress: string, value: string ): Promise<Transaction> => {
+export const createErc20TstTransferTxn = async ( account: UserChainAccount | undefined, toAddress: string, value: string ): Promise<Transaction> => {
     const mumbaiChainOptions = {
-        chainName: "mumbai"
+        chainName: "polygon-mumbai"
     }
 
     const mumbai = new ChainFactory().create(ChainType.EthereumV1, mumbaiEndpoints, {
@@ -76,11 +78,22 @@ export const createTransferTransaction = async ( account: UserChainAccount | und
     // construct eth transfer transaction 
     const transactionBody = await mumbai.new.Transaction()
 
-    transactionBody.actions = [{
-        // from: account?.chainAccount || "",
-        to: toAddress,
-        value: value,
-    }]
+
+    transactionBody.actions = [ await mumbai.composeAction(
+        ChainActionType.TokenTransferFrom,
+        {
+            contractName: toEthereumAddress("0x2d7882beDcbfDDce29Ba99965dd3cdF7fcB10A1e"),
+            toAccountName: toEthereumAddress(toAddress),
+            fromAccountName:  toEthereumAddress(account?.chainAccount || ""),
+            amount: toEthUnit(value),
+            symbol: toEthereumSymbol("TST"),
+            memo: "Test Polygon token transfer",
+            permission: 'active'
+        }
+    )]
+
+    console.log( `New Transaction: ${( await transactionBody.getSuggestedFee(TxExecutionPriority.Average) )}` )
+
 
     return transactionBody
 }
