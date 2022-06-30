@@ -85,7 +85,7 @@ export const createErc20TstTransferTxn = async ( account: UserChainAccount | und
     const mumbai = await connectChain()
 
     // construct eth transfer transaction 
-    const transactionBody = await mumbai.new.Transaction({
+    const transactionBody: Transaction = await mumbai.new.Transaction({
         maxFeeIncreasePercentage: 200.00
     })
 
@@ -103,8 +103,8 @@ export const createErc20TstTransferTxn = async ( account: UserChainAccount | und
         }
     )]
 
-    // await transactionBody.prepareToBeSigned()
-    // await transactionBody.validate()
+    await transactionBody.prepareToBeSigned()
+    await transactionBody.validate()
 
     // console.log( `New Transaction: ${( await transactionBody.getSuggestedFee(TxExecutionPriority.Average) )}` )
 
@@ -134,8 +134,8 @@ export const createErc1155TransferTxn = async ( account: UserChainAccount | unde
         }
     )]
 
-    // await transactionBody.prepareToBeSigned()
-    // await transactionBody.validate()
+    await transactionBody.prepareToBeSigned()
+    await transactionBody.validate()
 
     // console.log( `New Transaction: ${( await transactionBody.getSuggestedFee(TxExecutionPriority.Average) )}` )
 
