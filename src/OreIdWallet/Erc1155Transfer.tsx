@@ -3,6 +3,7 @@ import { useOreId, useUser } from "oreid-react";
 
 import { Button } from "src/Button";
 import { ChainNetwork } from "oreid-js";
+import { createErc1155TransferTxn } from "src/helpers";
 
 
 export const Erc1155Transfer: React.FC = () => {
@@ -26,23 +27,19 @@ export const Erc1155Transfer: React.FC = () => {
             return
         }
 
-        const transactionBody = {
-            "contractName": "0xA07e45A987F19E25176c877d98388878622623FA",
-            "contractAction": "safeTransferFrom",
-            "actions": [{
-                "from": signingAccount.chainAccount,
-                "to": erc1155Recipient,
-                "id": "123",
-                "amount": erc1155Amount,
-                "data": 0
-            }]
-        }
+        const transactionBody = await createErc1155TransferTxn(
+            signingAccount,
+            erc1155Recipient,
+            erc1155Amount
+        )
+
+        console.log( `ERC1155 Transaction Body: ${JSON.stringify(transactionBody.actions)}` )
 
         const transaction = await oreId.createTransaction({
             chainAccount: signingAccount.chainAccount,
             chainNetwork: ChainNetwork.PolygonMumbai,
             //@ts-ignore
-            transaction: transactionBody,
+            transaction: transactionBody.raw,
             signOptions: {
                 broadcast: true,
                 returnSignedTransaction: false,
@@ -52,7 +49,7 @@ export const Erc1155Transfer: React.FC = () => {
         oreId.popup
             .sign({ transaction })
             .then((result: any) => {
-                console.log( `result: ${JSON.stringify( result )}`)
+                console.log( `result: ${result}`)
             })
     }
 

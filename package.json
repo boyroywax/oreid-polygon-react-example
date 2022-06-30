@@ -6,7 +6,8 @@
     "node": "16.x.x"
   },
   "dependencies": {
-    "@open-rights-exchange/chainjs": "^3.4.2",
+    "@open-rights-exchange/chain-js": "^4.7.1",
+    "@open-rights-exchange/chain-js-plugin-ethereum": "4.7.0",
     "concurrently": "^4.1.2",
     "cors": "^2.8.5",
     "dotenv": "^8.1.0",

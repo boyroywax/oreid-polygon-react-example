@@ -48,9 +48,9 @@ export const TokenTransfer: React.FC = () => {
         oreId.popup
             .sign({ transaction })
             .then((result: any) => {
-                console.log( `result: ${result}`)
+                console.log( `result: ${JSON.stringify(result)}`)
             })
-            .finally(() => console.log( `txnid: ${transaction.data.transactionRecordId}` ))
+            // .finally(() =>  ))
     }
 
     return (

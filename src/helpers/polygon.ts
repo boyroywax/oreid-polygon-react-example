@@ -1,15 +1,34 @@
-import { ChainFactory, ChainType, Transaction } from "@open-rights-exchange/chainjs";
-import { toEthereumAddress, toEthereumSymbol, toEthUnit } from "@open-rights-exchange/chainjs/dist/chains/ethereum_1/helpers";
-import { ChainActionType, TxExecutionPriority } from "@open-rights-exchange/chainjs/dist/models";
+import { ChainType, Transaction, PluginChainFactory, Models } from "@open-rights-exchange/chain-js";
+import { Plugin as EthereumPlugin } from "@open-rights-exchange/chain-js-plugin-ethereum";
+import { toEthereumAddress, toEthereumSymbol, toEthUnit } from "@open-rights-exchange/chain-js-plugin-ethereum/dist/cjs/src/plugin/helpers";
+// import { toEthereumAddress, toEthereumSymbol, toEthUnit } from "@open-rights-exchange/chain-js-plugin-ethereum"
+// import { ChainActionType, TxExecutionPriority } from "@open-rights-exchange/chainjs/dist/models";
 import { UserChainAccount } from "oreid-js"
 import Web3 from "web3"
 import { AbiItem } from 'web3-utils';
 
 
-const mumbaiEndpoints = [
-    { url: "https://rpc-mumbai.maticvigil.com" },
-    { url: "https://rpc-mumbai.matic.today"}
+const mumbaiEndpoints: Models.ChainEndpoint[] = [
+    // { url: "https://rpc-mumbai.maticvigil.com/" },
+    // { url: "https://rpc-mumbai.matic.today"},
+    { url: "https://polygon-mumbai.g.alchemy.com/v2/AIIX0TtJA0j2FDoo5FzRc_e5766GxIPz"}
 ]
+
+export const connectChain = async (): Promise<any> => {
+    let chainId = "eth", networkId = "ropsten", doMSIG = false
+
+    const mumbaiChainOptions = {
+        chainName: "polygon-mumbai"
+    }
+
+    const mumbai = PluginChainFactory([EthereumPlugin], Models.ChainType.EthereumV1, mumbaiEndpoints, mumbaiChainOptions)
+
+    // connect to the chain
+    await mumbai.connect()
+    console.log("Connected to polygon mumbai network")
+    return mumbai
+}
+
 const provider = new Web3.providers.HttpProvider( mumbaiEndpoints[0].url )
 const web3 = new Web3( provider )
 
@@ -19,7 +38,7 @@ export const getBalance = async ( account: UserChainAccount | undefined ): Promi
     return format
 }
 
-// The minimum ABI to get ERC20 Token balance
+// Minimum ABI to get ERC20 Token balance
 const minBalanceABI: AbiItem = {    
     constant: true,
     inputs: [{ name: "_owner", type: "address" }],
@@ -39,7 +58,7 @@ export const getTstTokenBalance = async ( account: UserChainAccount | undefined 
     return format
 }
 
-// The minimum ABI to get ERC1155 Token balance
+// Minimum ABI to get ERC1155 Token balance
 const minErc1155BalanceABI: AbiItem = {    
     constant: true,
     inputs: [{ name: "_owner", type: "address" }, { name: "id", type: "uint256" }],
@@ -63,37 +82,62 @@ export const getNFTTokenBalance = async ( account: UserChainAccount | undefined 
 // Creat transaction using chainjs
 // 
 export const createErc20TstTransferTxn = async ( account: UserChainAccount | undefined, toAddress: string, value: string ): Promise<Transaction> => {
-    const mumbaiChainOptions = {
-        chainName: "polygon-mumbai"
-    }
-
-    const mumbai = new ChainFactory().create(ChainType.EthereumV1, mumbaiEndpoints, {
-        chainForkType: mumbaiChainOptions
-    })
-
-    // connect to the chain
-    await mumbai.connect()
-    console.log("Connected to polygon mumbai network")
+    const mumbai = await connectChain()
 
     // construct eth transfer transaction 
-    const transactionBody = await mumbai.new.Transaction()
-
+    const transactionBody = await mumbai.new.Transaction({
+        maxFeeIncreasePercentage: 200.00
+    })
 
     transactionBody.actions = [ await mumbai.composeAction(
-        ChainActionType.TokenTransferFrom,
+        Models.ChainActionType.TokenTransfer,
         {
             contractName: toEthereumAddress("0x2d7882beDcbfDDce29Ba99965dd3cdF7fcB10A1e"),
             toAccountName: toEthereumAddress(toAddress),
             fromAccountName:  toEthereumAddress(account?.chainAccount || ""),
-            amount: toEthUnit(value),
+            amount: value,
             symbol: toEthereumSymbol("TST"),
-            memo: "Test Polygon token transfer",
-            permission: 'active'
+            // memo: "Test Polygon token transfer",
+            permission: 'active',
+            precision: 18
         }
     )]
 
-    console.log( `New Transaction: ${( await transactionBody.getSuggestedFee(TxExecutionPriority.Average) )}` )
+    // await transactionBody.prepareToBeSigned()
+    // await transactionBody.validate()
 
+    // console.log( `New Transaction: ${( await transactionBody.getSuggestedFee(TxExecutionPriority.Average) )}` )
+
+    return transactionBody
+}
+
+export const createErc1155TransferTxn = async ( account: UserChainAccount | undefined, toAddress: string, value: string ): Promise<Transaction> => {
+    const mumbai = await connectChain()
+
+    // construct eth transfer transaction 
+    const transactionBody = await mumbai.new.Transaction({
+        maxFeeIncreasePercentage: 200.00
+    })
+
+    transactionBody.actions = [ await mumbai.composeAction(
+        Models.ChainActionType.TokenTransferFrom,
+        {
+            contractName: toEthereumAddress("0xA07e45A987F19E25176c877d98388878622623FA"),
+            toAccountName: toEthereumAddress(toAddress),
+            fromAccountName:  toEthereumAddress(account?.chainAccount || ""),
+            amount: value,
+            // symbol: toEthereumSymbol("ERC1155"),
+            memo: "Test Polygon token transfer",
+            permission: 'active',
+            id: 123,
+            data: 0
+        }
+    )]
+
+    // await transactionBody.prepareToBeSigned()
+    // await transactionBody.validate()
+
+    // console.log( `New Transaction: ${( await transactionBody.getSuggestedFee(TxExecutionPriority.Average) )}` )
 
     return transactionBody
 }

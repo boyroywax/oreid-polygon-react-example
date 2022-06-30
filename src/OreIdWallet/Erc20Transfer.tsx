@@ -1,10 +1,8 @@
 import React, { useState } from "react";
+import { ChainNetwork, UserChainAccount } from "oreid-js";
 import { useOreId, useUser } from "oreid-react";
 
 import { Button } from "src/Button";
-import { ChainNetwork, UserChainAccount } from "oreid-js";
-import { ChainFactory } from "@open-rights-exchange/chainjs";
-import { ChainType } from "@open-rights-exchange/chainjs/dist/models";
 import { createErc20TstTransferTxn } from "src/helpers";
 
 
@@ -28,9 +26,6 @@ export const Erc20Transfer: React.FC = () => {
             )
             return
         }
-
-        const erc20TstContract = "0x2d7882beDcbfDDce29Ba99965dd3cdF7fcB10A1e"
-
         console.log( `recipient: ${recipient} \n amount: ${erc20Amount}`)
         
         const transactionBody = await createErc20TstTransferTxn(
@@ -38,8 +33,8 @@ export const Erc20Transfer: React.FC = () => {
             recipient,
             erc20Amount
         )
-
-        console.log("ERC20 Transaction Body: " + JSON.stringify(transactionBody))
+        // console.log( `ERC20 Transaction Body: ${JSON.stringify(transactionBody.actions)} `)
+        console.log( `ERC20 Transaction Body: ${JSON.stringify(transactionBody.actions)}` )
 
         // const transactionBody = {
         //     "contractName": "0x2d7882beDcbfDDce29Ba99965dd3cdF7fcB10A1e",
@@ -55,7 +50,7 @@ export const Erc20Transfer: React.FC = () => {
             chainAccount: signingAccount.chainAccount,
             chainNetwork: ChainNetwork.PolygonMumbai,
             //@ts-ignore
-            transaction: transactionBody,
+            transaction: transactionBody.raw,
             signOptions: {
                 broadcast: true,
                 returnSignedTransaction: false,
@@ -65,7 +60,7 @@ export const Erc20Transfer: React.FC = () => {
         oreId.popup
             .sign({ transaction })
             .then((result: any) => {
-                console.log( `result: ${JSON.stringify( result )}`)
+                console.log( `result: ${result}` )
             })
     }
 
