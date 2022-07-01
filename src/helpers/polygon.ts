@@ -15,7 +15,6 @@ const mumbaiEndpoints: Models.ChainEndpoint[] = [
 ]
 
 export const connectChain = async (): Promise<any> => {
-    let chainId = "eth", networkId = "ropsten", doMSIG = false
 
     const mumbaiChainOptions = {
         chainName: "polygon-mumbai"
@@ -126,11 +125,11 @@ export const createErc1155TransferTxn = async ( account: UserChainAccount | unde
             toAccountName: toEthereumAddress(toAddress),
             fromAccountName:  toEthereumAddress(account?.chainAccount || ""),
             amount: value,
-            // symbol: toEthereumSymbol("ERC1155"),
+            symbol: toEthereumSymbol("ERC1155"),
             memo: "Test Polygon token transfer",
             permission: 'active',
             id: 123,
-            data: 0
+            precision: 1
         }
     )]
 

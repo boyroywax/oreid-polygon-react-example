@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ChainNetwork, UserChainAccount } from "oreid-js";
+import { ChainNetwork, UserChainAccount, Transaction } from "oreid-js";
 import { useOreId, useUser } from "oreid-react";
 
 import { Button } from "src/Button";
@@ -46,7 +46,7 @@ export const Erc20Transfer: React.FC = () => {
         //     }]
         // }
 
-        const transaction = await oreId.createTransaction({
+        const transaction: Transaction = await oreId.createTransaction({
             chainAccount: signingAccount.chainAccount,
             chainNetwork: ChainNetwork.PolygonMumbai,
             //@ts-ignore
@@ -60,7 +60,7 @@ export const Erc20Transfer: React.FC = () => {
         oreId.popup
             .sign({ transaction })
             .then((result: any) => {
-                console.log( `result: ${result}` )
+                console.log( `result: ${JSON.stringify(result)}` )
             })
     }
 
