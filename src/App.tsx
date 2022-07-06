@@ -7,7 +7,7 @@ import "./App.css";
 import { ExternalWallet } from "./ExternalWallet";
 import { Header } from "./Header";
 import { LoginPage } from "./LoginPage";
-import { Erc20Transfer, TokenTransfer, UserBalance } from "./OreIdWallet";
+import { Erc1155Approve, Erc20Transfer, TokenTransfer, TokenTransferCancel, UserBalance } from "./OreIdWallet";
 import { REACT_APP_OREID_APP_ID } from "./constants";
 import { Erc1155Transfer } from "./OreIdWallet/Erc1155Transfer";
 
@@ -20,7 +20,7 @@ const transitProviders = [
 const oreId = new OreId({
 	appName: "Polygon ORE-ID Sample App",
 	appId: REACT_APP_OREID_APP_ID,
-	oreIdUrl: "https://staging.service.oreid.io",
+	oreIdUrl: "https://dev.service.oreid.io",
 	plugins: {
 		popup: WebPopup(),
 	},
@@ -38,12 +38,16 @@ const LoggedInView: React.FC = () => {
 					<tr>
 						<td align="center">
 							<TokenTransfer />
+							<br />
+							<TokenTransferCancel />
 						</td>
 						<td align="center">
 							<Erc20Transfer />
 						</td>
 						<td align="center">
 							<Erc1155Transfer />
+							<br />
+							<Erc1155Approve />
 						</td>
 					</tr>
 				</tbody>

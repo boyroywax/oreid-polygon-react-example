@@ -1,26 +1,28 @@
-import { ChainType, Transaction, PluginChainFactory, Models } from "@open-rights-exchange/chain-js";
-import { Plugin as EthereumPlugin } from "@open-rights-exchange/chain-js-plugin-ethereum";
+import { ChainType, Transaction, PluginChainFactory, Models, Chain } from "@open-rights-exchange/chain-js";
+import { Plugin as EthereumPlugin , ModelsEthereum} from "@open-rights-exchange/chain-js-plugin-ethereum";
 import { toEthereumAddress, toEthereumSymbol, toEthUnit } from "@open-rights-exchange/chain-js-plugin-ethereum/dist/cjs/src/plugin/helpers";
 // import { toEthereumAddress, toEthereumSymbol, toEthUnit } from "@open-rights-exchange/chain-js-plugin-ethereum"
 // import { ChainActionType, TxExecutionPriority } from "@open-rights-exchange/chainjs/dist/models";
 import { UserChainAccount } from "oreid-js"
 import Web3 from "web3"
+import { Erc1155ApproveParams, Erc1155SafeTransferFromParams, Erc20TransferParams } from "@open-rights-exchange/chain-js-plugin-ethereum/dist/cjs/src/plugin/templates/models";
 import { AbiItem } from 'web3-utils';
+import { ChainEntityNameBrand } from "@open-rights-exchange/chain-js/dist/cjs/src/models";
 
 
 const mumbaiEndpoints: Models.ChainEndpoint[] = [
-    // { url: "https://rpc-mumbai.maticvigil.com/" },
+    { url: "https://rpc-mumbai.maticvigil.com/" },
     // { url: "https://rpc-mumbai.matic.today"},
-    { url: "https://polygon-mumbai.g.alchemy.com/v2/AIIX0TtJA0j2FDoo5FzRc_e5766GxIPz"}
+    // { url: "https://polygon-mumbai.g.alchemy.com/v2/AIIX0TtJA0j2FDoo5FzRc_e5766GxIPz"}
 ]
 
-export const connectChain = async (): Promise<any> => {
+export const connectChain = async (): Promise<Chain> => {
 
     const mumbaiChainOptions = {
         chainName: "polygon-mumbai"
     }
 
-    const mumbai = PluginChainFactory([EthereumPlugin], Models.ChainType.EthereumV1, mumbaiEndpoints, mumbaiChainOptions)
+    const mumbai: Chain = PluginChainFactory([EthereumPlugin], Models.ChainType.EthereumV1, mumbaiEndpoints, mumbaiChainOptions)
 
     // connect to the chain
     await mumbai.connect()
@@ -77,6 +79,34 @@ export const getNFTTokenBalance = async ( account: UserChainAccount | undefined 
     return result
 }
 
+export const getPendingTxnsByAccount = async ( account: UserChainAccount | undefined ): Promise<{highestTxn: number, pendingTxn: number}> => {
+    const pendingTxns = await web3.eth.getPendingTransactions().then((result) => {for (let txn of result) console.log(txn.hash)})
+    const highestNonceExecuted = await web3.eth.getTransactionCount(account?.chainAccount || "", 'latest')
+    const highestNoncePending = await web3.eth.getTransactionCount(account?.chainAccount || "", 'pending')
+    console.log('last nonce executed: ', highestNonceExecuted)
+    console.log('highest nonce pending: ', highestNoncePending)
+    // const cancelationTrx = {
+    //   from: account?.chainAccount,
+    //   to: account?.chainAccount,
+    //   amount: 0,
+    //   nonce: highestNonceExecuted + 1
+    // }
+    return {
+        highestTxn: highestNonceExecuted,
+        pendingTxn: highestNoncePending - highestNonceExecuted
+    }
+    //     for (let txn in pendingTxns) {
+//         console.log( `Pending txn: ${txn}`)
+// }
+}
+
+export const getGasFees = async () => {
+    const mumbai: Chain = await connectChain()
+    const chainInfo = await mumbai.chainInfo.nativeInfo
+    console.log(chainInfo)
+    return chainInfo
+}
+
 // 
 // Creat transaction using chainjs
 // 
@@ -88,18 +118,51 @@ export const createErc20TstTransferTxn = async ( account: UserChainAccount | und
         maxFeeIncreasePercentage: 200.00
     })
 
+    const composeErc20TstTransferParams: Erc20TransferParams = {
+        contractAddress: toEthereumAddress("0x2d7882beDcbfDDce29Ba99965dd3cdF7fcB10A1e"),
+        to: toEthereumAddress(toAddress),
+        from:  toEthereumAddress(account?.chainAccount || ""),
+        value: value,
+        precision: 18
+    }
+
+    const action = await mumbai.composeAction(
+        ModelsEthereum.EthereumChainActionType.ERC20Transfer,
+        composeErc20TstTransferParams
+    )
+
+    console.log( `actions: ${JSON.stringify(action)}`)
+    
+
+    transactionBody.actions = [action]
+
+    console.log(await mumbai.decomposeAction(action))
+
+    await transactionBody.prepareToBeSigned()
+    await transactionBody.validate()
+
+    // console.log( `New Transaction: ${( await transactionBody.getSuggestedFee(TxExecutionPriority.Average) )}` )
+
+    return transactionBody
+}
+
+export const approveErc1155Token = async ( account: UserChainAccount | undefined ): Promise<Transaction> => {
+    const mumbai = await connectChain()
+
+    const transactionBody = await mumbai.new.Transaction({
+        maxFeeIncreasePercentage: 200.0
+    })
+
+    const composeApproveParams: Erc1155ApproveParams = {
+        contractAddress: toEthereumAddress("0xA07e45A987F19E25176c877d98388878622623FA"),
+        to: toEthereumAddress(account?.chainAccount || ""),
+        tokenId: 123,
+        quantity: 1
+    }
+
     transactionBody.actions = [ await mumbai.composeAction(
-        Models.ChainActionType.TokenTransfer,
-        {
-            contractName: toEthereumAddress("0x2d7882beDcbfDDce29Ba99965dd3cdF7fcB10A1e"),
-            toAccountName: toEthereumAddress(toAddress),
-            fromAccountName:  toEthereumAddress(account?.chainAccount || ""),
-            amount: value,
-            symbol: toEthereumSymbol("TST"),
-            // memo: "Test Polygon token transfer",
-            permission: 'active',
-            precision: 18
-        }
+        ModelsEthereum.EthereumChainActionType.ERC1155Approve,
+        composeApproveParams
     )]
 
     await transactionBody.prepareToBeSigned()
@@ -118,23 +181,27 @@ export const createErc1155TransferTxn = async ( account: UserChainAccount | unde
         maxFeeIncreasePercentage: 200.00
     })
 
+    const composeErc1155Params: Erc1155SafeTransferFromParams =    {
+        contractAddress: toEthereumAddress("0xA07e45A987F19E25176c877d98388878622623FA"),
+        from: toEthereumAddress(account?.chainAccount || ""),
+        transferFrom:  toEthereumAddress(account?.chainAccount || ""),
+        to: toEthereumAddress(toAddress),
+        tokenId: 123,
+        quantity: 1,
+        // symbol: toEthereumSymbol("ERC1155"),
+        // memo: "Test Polygon token transfer",
+        // data: 0
+    }
+
     transactionBody.actions = [ await mumbai.composeAction(
-        Models.ChainActionType.TokenTransferFrom,
-        {
-            contractName: toEthereumAddress("0xA07e45A987F19E25176c877d98388878622623FA"),
-            toAccountName: toEthereumAddress(toAddress),
-            fromAccountName:  toEthereumAddress(account?.chainAccount || ""),
-            amount: value,
-            symbol: toEthereumSymbol("ERC1155"),
-            memo: "Test Polygon token transfer",
-            permission: 'active',
-            id: 123,
-            precision: 1
-        }
+        ModelsEthereum.EthereumChainActionType.ERC1155SafeTransferFrom,
+        composeErc1155Params
     )]
 
+    console.log( `actions: ${JSON.stringify(transactionBody.actions)}`)
+
     await transactionBody.prepareToBeSigned()
-    await transactionBody.validate()
+    // await transactionBody.validate()
 
     // console.log( `New Transaction: ${( await transactionBody.getSuggestedFee(TxExecutionPriority.Average) )}` )
 

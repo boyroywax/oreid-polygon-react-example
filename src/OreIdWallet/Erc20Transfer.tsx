@@ -4,6 +4,7 @@ import { useOreId, useUser } from "oreid-react";
 
 import { Button } from "src/Button";
 import { createErc20TstTransferTxn } from "src/helpers";
+import { getChainAccount } from "src/helpers/user";
 
 
 export const Erc20Transfer: React.FC = () => {
@@ -16,16 +17,13 @@ export const Erc20Transfer: React.FC = () => {
     if (!userData) return null;
 
     const handleSign = async () => {
-        const signingAccount: UserChainAccount | undefined = userData.chainAccounts.find(
-            (ca) => ca.chainNetwork === polygonChainType
-        )
-
-        if (!signingAccount) {
-            console.error(
-                `User doesn not have any accounts on ${polygonChainType}`
+        const signingAccount: UserChainAccount | undefined = getChainAccount(
+                userData
             )
+        if (!signingAccount) {
             return
-        }
+        } 
+
         console.log( `recipient: ${recipient} \n amount: ${erc20Amount}`)
         
         const transactionBody = await createErc20TstTransferTxn(
@@ -50,7 +48,7 @@ export const Erc20Transfer: React.FC = () => {
             chainAccount: signingAccount.chainAccount,
             chainNetwork: ChainNetwork.PolygonMumbai,
             //@ts-ignore
-            transaction: transactionBody.raw,
+            transaction: transactionBody.actions[0],
             signOptions: {
                 broadcast: true,
                 returnSignedTransaction: false,
