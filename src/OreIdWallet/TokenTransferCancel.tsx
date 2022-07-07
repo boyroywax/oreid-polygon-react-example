@@ -5,11 +5,7 @@ import { Button } from "src/Button";
 import { Transaction, UserChainAccount } from "oreid-js";
 import { getChainAccount } from "src/helpers/user";
 import { getGasFees, getPendingTxnsByAccount } from "src/helpers";
-import { EthereumTransaction } from "@open-rights-exchange/chain-js-plugin-ethereum";
-import { toHexStringIfNeeded } from "@open-rights-exchange/chain-js/dist/cjs/src/helpers";
 import { toEthUnit } from "@open-rights-exchange/chain-js-plugin-ethereum/dist/cjs/src/plugin/helpers";
-// import { toEthUnit } from "@open-rights-exchange/chain-js-plugin-ethereum/dist/cjs/src/plugin/helpers";
-// import { ChainInfo } from "@open-rights-exchange/chain-js/dist/cjs/src/models";
 import { toHex } from "web3-utils"
 
 
@@ -19,7 +15,7 @@ export const TokenTransferCancel: React.FC = () => {
     const [ highestTxnNonce, setHighestTxnNonce ] = useState(0)
     const [ pendingNonce, setPendingNonce ] = useState(0)
     const [ gasLimit, setGasLimit ] = useState(0)
-    const [ gasPrice, setGasPrice ] = useState(0)
+    const [ gasPrice, setGasPrice ] = useState("0")
     const userData = useUser();
     const oreId = useOreId();
     const polygonChainType = 'polygon_mumbai'
@@ -43,6 +39,7 @@ export const TokenTransferCancel: React.FC = () => {
         const gasFees = await getGasFees()
         console.log(gasFees.gasLimit)
         setGasLimit(gasFees.gasLimit)
+        console.log(gasFees.currentGasPrice)
         setGasPrice(gasFees.currentGasPrice)
     }
 
@@ -59,25 +56,21 @@ export const TokenTransferCancel: React.FC = () => {
             userData
         )
         if (!signingAccount) {
-            return
+            return null
         } 
-
-        // const action: 
 
         const transactionBody = {
             actions: [{
-                gasPrice: toEthUnit(gasPrice.toString()),
-                gasLimit: toEthUnit((gasLimit + 40000000000).toString()),
+                gasPrice: toHex(toEthUnit((Number(gasPrice) * 2).toString())),
+                gasLimit: toHex(toEthUnit(gasLimit.toString())),
                 from: signingAccount.chainAccount,
                 to: signingAccount.chainAccount,
                 value: 0,
                 // nonce: highestTxnNonce + 1,
-
-
             }]
         }
 
-        console.log( `Token Transfer Cancel Transaction Body: ${JSON.stringify(transactionBody.actions)}` )
+        console.log( `Token Transfer Cancel Transaction Body: ${JSON.stringify(transactionBody)}` )
 
         const transaction: Transaction = await oreId.createTransaction({
             chainAccount: signingAccount.chainAccount,

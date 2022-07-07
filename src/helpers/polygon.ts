@@ -131,10 +131,9 @@ export const createErc20TstTransferTxn = async ( account: UserChainAccount | und
         composeErc20TstTransferParams
     )
 
-    console.log( `actions: ${JSON.stringify(action)}`)
-    
-
     transactionBody.actions = [action]
+
+    console.log( `actions: ${transactionBody.raw}`)
 
     console.log(await mumbai.decomposeAction(action))
 
