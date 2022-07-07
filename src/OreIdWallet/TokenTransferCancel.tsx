@@ -5,8 +5,12 @@ import { Button } from "src/Button";
 import { Transaction, UserChainAccount } from "oreid-js";
 import { getChainAccount } from "src/helpers/user";
 import { getGasFees, getPendingTxnsByAccount } from "src/helpers";
+import { EthereumTransaction } from "@open-rights-exchange/chain-js-plugin-ethereum";
+import { toHexStringIfNeeded } from "@open-rights-exchange/chain-js/dist/cjs/src/helpers";
+import { toEthUnit } from "@open-rights-exchange/chain-js-plugin-ethereum/dist/cjs/src/plugin/helpers";
 // import { toEthUnit } from "@open-rights-exchange/chain-js-plugin-ethereum/dist/cjs/src/plugin/helpers";
 // import { ChainInfo } from "@open-rights-exchange/chain-js/dist/cjs/src/models";
+import { toHex } from "web3-utils"
 
 
 export const TokenTransferCancel: React.FC = () => {
@@ -35,12 +39,11 @@ export const TokenTransferCancel: React.FC = () => {
         const { highestTxn, pendingTxn } = await getPendingTxnsByAccount(signingAccount)
         setHighestTxnNonce( highestTxn )
         setPendingNonce( pendingTxn - highestTxn )
-
+   
         const gasFees = await getGasFees()
+        console.log(gasFees.gasLimit)
         setGasLimit(gasFees.gasLimit)
-        setGasPrice(gasFees.currentGasPrice * 3)
-
-
+        setGasPrice(gasFees.currentGasPrice)
     }
 
     useEffect( () => {
@@ -59,14 +62,18 @@ export const TokenTransferCancel: React.FC = () => {
             return
         } 
 
+        // const action: 
+
         const transactionBody = {
             actions: [{
+                gasPrice: toEthUnit(gasPrice.toString()),
+                gasLimit: toEthUnit((gasLimit + 40000000000).toString()),
                 from: signingAccount.chainAccount,
                 to: signingAccount.chainAccount,
                 value: 0,
-                nonce: highestTxnNonce + 1,
-                gasPrice: gasPrice,
-                gasLimit: gasLimit
+                // nonce: highestTxnNonce + 1,
+
+
             }]
         }
 
@@ -76,11 +83,11 @@ export const TokenTransferCancel: React.FC = () => {
             chainAccount: signingAccount.chainAccount,
             chainNetwork: signingAccount.chainNetwork,
             //@ts-ignore
-            transaction: transactionBody,
+            transaction: transactionBody.actions[0],
             signOptions: {
                 broadcast: true,
                 returnSignedTransaction: false,
-            },
+            }, 
         })
 
         const pendingTxns = await getPendingTxnsByAccount( signingAccount )
