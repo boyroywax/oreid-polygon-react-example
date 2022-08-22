@@ -2,9 +2,6 @@
   "name": "react-atomichub",
   "version": "1.0.0",
   "private": true,
-  "engines": {
-    "node": "16.x.x"
-  },
   "dependencies": {
     "@open-rights-exchange/chain-js": "^4.7.1",
     "@open-rights-exchange/chain-js-plugin-ethereum": "4.7.0",

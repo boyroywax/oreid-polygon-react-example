@@ -20,7 +20,7 @@ const transitProviders = [
 const oreId = new OreId({
 	appName: "Polygon ORE-ID Sample App",
 	appId: REACT_APP_OREID_APP_ID,
-	oreIdUrl: "https://dev.service.oreid.io",
+	oreIdUrl: "https://service.oreid.io",
 	plugins: {
 		popup: WebPopup(),
 	},

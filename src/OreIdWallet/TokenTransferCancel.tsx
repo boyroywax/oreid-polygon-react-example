@@ -1,3 +1,4 @@
+import { toEthUnit } from "@open-rights-exchange/chain-js-plugin-ethereum/dist/cjs/src/plugin/helpers";
 import React, { useState, useEffect } from "react";
 import { useOreId, useUser } from "oreid-react";
 
@@ -5,8 +6,7 @@ import { Button } from "src/Button";
 import { Transaction, UserChainAccount } from "oreid-js";
 import { getChainAccount } from "src/helpers/user";
 import { getGasFees, getPendingTxnsByAccount } from "src/helpers";
-import { toEthUnit } from "@open-rights-exchange/chain-js-plugin-ethereum/dist/cjs/src/plugin/helpers";
-import { toHex } from "web3-utils"
+import { toHex } from "web3-utils";
 
 
 export const TokenTransferCancel: React.FC = () => {
@@ -19,7 +19,6 @@ export const TokenTransferCancel: React.FC = () => {
     const userData = useUser();
     const oreId = useOreId();
     const polygonChainType = 'polygon_mumbai'
-
 
     async function prepareTxn() {
 
@@ -34,7 +33,11 @@ export const TokenTransferCancel: React.FC = () => {
         
         const { highestTxn, pendingTxn } = await getPendingTxnsByAccount(signingAccount)
         setHighestTxnNonce( highestTxn )
-        setPendingNonce( pendingTxn - highestTxn )
+
+        if (pendingTxn > 0) {
+            setPendingNonce( pendingTxn - highestTxn)
+        }
+        setPendingNonce( 0 )
    
         const gasFees = await getGasFees()
         console.log(gasFees.gasLimit)
@@ -61,12 +64,14 @@ export const TokenTransferCancel: React.FC = () => {
 
         const transactionBody = {
             actions: [{
-                gasPrice: toHex(toEthUnit((Number(gasPrice) * 2).toString())),
-                gasLimit: toHex(toEthUnit(gasLimit.toString())),
                 from: signingAccount.chainAccount,
                 to: signingAccount.chainAccount,
                 value: 0,
                 // nonce: highestTxnNonce + 1,
+            }],
+            options: [{
+                gasPrice: toHex(toEthUnit((Number(gasPrice)).toString())),
+                gasLimit: toHex(toEthUnit(gasLimit.toString())),
             }]
         }
 
@@ -76,7 +81,7 @@ export const TokenTransferCancel: React.FC = () => {
             chainAccount: signingAccount.chainAccount,
             chainNetwork: signingAccount.chainNetwork,
             //@ts-ignore
-            transaction: transactionBody.actions[0],
+            transaction: transactionBody,
             signOptions: {
                 broadcast: true,
                 returnSignedTransaction: false,
@@ -100,7 +105,7 @@ export const TokenTransferCancel: React.FC = () => {
             <div className="App-button">
                 <Button
                     onClick={() => handleSign()}
-                > Cancel last transfer {pendingNonce})
+                > Cancel last transfer ({pendingNonce})
                 </Button>
             </div>
         </div>

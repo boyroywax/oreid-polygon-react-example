@@ -7,7 +7,7 @@ import { Transaction } from "oreid-js";
 
 export const TokenTransfer: React.FC = () => {
     const [ amount, setAmount ] = useState("0.00")
-    const [ toAddress, setToAddress ] = useState("Null")
+    const [ toAddress, setToAddress ] = useState("")
     const userData = useUser();
     const oreId = useOreId();
     const polygonChainType = 'polygon_mumbai'
@@ -38,7 +38,7 @@ export const TokenTransfer: React.FC = () => {
             chainAccount: signingAccount.chainAccount,
             chainNetwork: signingAccount.chainNetwork,
             //@ts-ignore
-            transaction: transactionBody,
+            transaction: transactionBody.actions[0],
             signOptions: {
                 broadcast: true,
                 returnSignedTransaction: false,
